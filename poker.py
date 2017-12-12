@@ -1,5 +1,5 @@
 from pypokerengine.api.game import setup_config, start_poker
-from RandomPokerPlayer import RandomPokerPlayer
+from RandomPokerPlayer import *
 from pprint import pprint
 
 config = setup_config(max_round=10, initial_stack=100, small_blind_amount=5)
