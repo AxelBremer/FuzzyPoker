@@ -1,6 +1,23 @@
 from collections import Counter
+from pypokerengine.utils.card_utils import gen_cards, estimate_hole_card_win_rate
 
 class Calculations():
+
+    def get_winprob(round_state, hole_card):
+        return estimate_hole_card_win_rate(1000, 2, gen_cards(hole_card), gen_cards(round_state['community_card']))
+
+    def get_money_score(round_state):
+        scoredict = {}
+        p1 = round_state['seats'][0]
+        p2 = round_state['seats'][1]
+
+        total = p1['stack'] + p2['stack']
+        p1score = (1/total)*p1['stack']
+        p2score = (1/total)*p2['stack']
+
+        scoredict[p1['uuid']] = p1score
+        scoredict[p2['uuid']] = p2score
+        return scoredict
 
     def player_aggressiveness(round_state):
         """
