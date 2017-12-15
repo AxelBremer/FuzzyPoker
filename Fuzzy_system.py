@@ -154,7 +154,7 @@ def run_fuzzy_system(tightness, aggressiveness, money_opponent, money_player, pr
 	titles = ["Tightness opponent", "Aggressiveness opponent", "Risk aversive behavior"]
 	# visualize_memberships(Risk, risk_members[0], risk_members[1], risk_members[2], titles)
 	# visualize_result(Risk, risk_members[2], risk0, aggregated, aversion)
-	print("aversion", aversion)
+	# print("aversion", aversion)
 
 	# Compute quality cards opponent
 	# Input: risk aversive behavior and money left opponent
@@ -167,7 +167,7 @@ def run_fuzzy_system(tightness, aggressiveness, money_opponent, money_player, pr
 	titles = ["Risk aversion opponent", "Money left opponent ", "Quality cards opponent"]
 	#visualize_memberships(Quality, quality_members[0], quality_members[1], quality_members[2], titles)
 	#visualize_result(Quality, quality_members[2], risk0, aggregated, quality_cards_opponent)
-	print("quality", quality_cards_opponent)
+	# print("quality", quality_cards_opponent)
 
 	# Compute odds player
 	# Input: probability hand of hand player and money left player
@@ -181,7 +181,7 @@ def run_fuzzy_system(tightness, aggressiveness, money_opponent, money_player, pr
 	titles = ["Probability hand", "Money left player", "Odds player"]
 	#visualize_memberships(Odds, odds_members[0], odds_members[1], odds_members[2], titles)
 	#visualize_result(Odds, odds_members[2], risk0, aggregated, odds_player)
-	print("odds", odds_player)
+	# print("odds", odds_player)
 
 
 	# Compute optimal strategy player
@@ -194,7 +194,7 @@ def run_fuzzy_system(tightness, aggressiveness, money_opponent, money_player, pr
 	titles = ["Quality cards opponent", "Odds player", "Strategy"]
 	#visualize_memberships(Odds, odds_members[0], odds_members[1], odds_members[2], titles)
 	#visualize_result(Odds, odds_members[2], risk0, aggregated, optimal)
-	print("optimal  crips", optimal)
+	# print("optimal  crisp", optimal)
 	return optimal
 
 tight = 0.1
