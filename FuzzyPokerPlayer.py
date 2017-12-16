@@ -16,11 +16,7 @@ class FuzzyPokerPlayer(BasePokerPlayer):  # Do not forget to make parent class a
         money_opponent = calc.get_money_score(round_state)[opponent['uuid']]
         money_me = calc.get_money_score(round_state)[me['uuid']]
         winprob = calc.get_winprob(round_state, hole_card)
-        # print(run_fuzzy_system(tight, aggro, money_opponent, money_me, winprob))
-        # pprint(valid_actions)
-        # pprint(hole_card)
-        # pprint(round_state)
-        # input('...')
+        print(run_fuzzy_system(tight, aggro, money_opponent, money_me, winprob))
         action, amount = call_action_info["action"], call_action_info["amount"]
         return action, amount   # action returned here is sent to the poker engine
 
