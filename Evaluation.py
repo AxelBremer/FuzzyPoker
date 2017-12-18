@@ -5,6 +5,7 @@ import numpy as np
 import os
 import sys
 from pprint import pprint
+import platform
 
 if len(sys.argv) != 2:
     print("usage: Evaluation.py [number of iterations]")
@@ -27,7 +28,10 @@ else:
         else:
             wins.append(0)
             amount.append(0)
-        os.system('cls')
+        if platform.system() == 'Windows':
+            os.system('cls')
+        if platform.system() == 'Linux':
+           os.system('clear')
 
     wins = np.array(wins)
     amount = np.array(amount)
