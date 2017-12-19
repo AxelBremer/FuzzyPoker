@@ -225,38 +225,52 @@ def run_fuzzy_system(tightness, aggressiveness, money_opponent, money_player, pr
     # Compute optimal strategy player
     # Input: quality cards opponent and odds player
     # Ouput: indication of optimal strategy for player
-    aggressiveness_opponent = ctrl.Antecedent(np.arange(0,1,0.1), 'aggressiveness')
-    aggressiveness_opponent.automf(3)
-    quality_cards_opponent = ctrl.Antecedent(np.arange(0,1,0.1), 'quality_cards_opponent')
-    quality_cards_opponent.automf(3)
-    odds_player = ctrl.Antecedent(np.arange(0,1, 0.1), 'odds_player')
-    odds_player.automf(3)
-    strategy_optimal = ctrl.Consequent(np.arange(0, 1, 0.1), 'strategy_optimal')
+    aggressiveness_opponent = ctrl.Antecedent(np.arange(0,1.1,0.1), 'aggressiveness')
+    aggressiveness_opponent['low'] = fuzz.trimf(aggressiveness_opponent.universe, [0,0,0.5])
+    aggressiveness_opponent['medium'] = fuzz.trimf(aggressiveness_opponent.universe, [0,0.5,1])
+    aggressiveness_opponent['high'] = fuzz.trimf(aggressiveness_opponent.universe, [0.5,1,1])
+    quality_cards_opponent = ctrl.Antecedent(np.arange(0,1.1,0.1), 'quality_cards_opponent')
+    quality_cards_opponent['low'] = fuzz.trimf(quality_cards_opponent.universe, [0,0,0.5])
+    quality_cards_opponent['medium'] = fuzz.trimf(quality_cards_opponent.universe, [0,0.5,1])
+    quality_cards_opponent['high'] = fuzz.trimf(quality_cards_opponent.universe, [0.5,1,1])
+    odds_player = ctrl.Antecedent(np.arange(0,1.1, 0.1), 'odds_player')
+    odds_player['low'] = fuzz.trimf(odds_player.universe, [0,0,0.5])
+    odds_player['medium'] = fuzz.trimf(odds_player.universe, [0,0.5,1])
+    odds_player['high'] = fuzz.trimf(odds_player.universe, [0.5,1,1])
+    strategy_optimal = ctrl.Consequent(np.arange(0, 1.1, 0.1), 'strategy_optimal')
     strategy_optimal['fold'] = fuzz.trimf(strategy_optimal.universe, [0,0,0.5])
     strategy_optimal['call'] = fuzz.trimf(strategy_optimal.universe, [0,0.5,1])
     strategy_optimal['raise'] = fuzz.trimf(strategy_optimal.universe, [0.5,1,1])
 
-    rule1 = ctrl.Rule(odds_player['poor'] & aggressiveness_opponent['good'] & quality_cards_opponent['poor'], strategy_optimal['raise'])
-    rule2 = ctrl.Rule(quality_cards_opponent['poor'] & odds_player['average'], strategy_optimal['call'])
-    rule3 = ctrl.Rule(quality_cards_opponent['poor'] & odds_player['good'], strategy_optimal['raise'])
-    rule1 = ctrl.Rule(odds_player['poor'] & aggressiveness_opponent['poor'], strategy_optimal['fold'])
+    rules = []
 
-    strategy_ctrl = ctrl.ControlSystem([rule1,rule2,rule3])
+    rules.append(ctrl.Rule(odds_player['low'] & quality_cards_opponent['low'] & aggressiveness_opponent['low'], strategy_optimal['call']))
+    rules.append(ctrl.Rule(odds_player['low'] & quality_cards_opponent['low'] & aggressiveness_opponent['medium'], strategy_optimal['call']))
+    rules.append(ctrl.Rule(odds_player['low'] & quality_cards_opponent['low'] & aggressiveness_opponent['high'], strategy_optimal['raise']))
+    rules.append(ctrl.Rule(odds_player['low'] & quality_cards_opponent['medium'], strategy_optimal['fold']))
+    rules.append(ctrl.Rule(odds_player['low'] & quality_cards_opponent['high'], strategy_optimal['fold']))
+    rules.append(ctrl.Rule(odds_player['medium'] & quality_cards_opponent['low'], strategy_optimal['call']))
+    rules.append(ctrl.Rule(odds_player['medium'] & quality_cards_opponent['medium'], strategy_optimal['raise']))
+    rules.append(ctrl.Rule(odds_player['medium'] & quality_cards_opponent['high'], strategy_optimal['call']))
+    rules.append(ctrl.Rule(odds_player['high'] & quality_cards_opponent['low'], strategy_optimal['call']))
+    rules.append(ctrl.Rule(odds_player['high'] & quality_cards_opponent['medium'], strategy_optimal['raise']))
+    rules.append(ctrl.Rule(odds_player['high'] & quality_cards_opponent['high'], strategy_optimal['raise']))
+    rules.append(ctrl.Rule(odds_player['high'] & quality_cards_opponent['low'] & aggressiveness_opponent['high'], strategy_optimal['raise']))
+    rules.append(ctrl.Rule(odds_player['high'] & quality_cards_opponent['medium'] & aggressiveness_opponent['high'], strategy_optimal['raise']))
+    rules.append(ctrl.Rule(odds_player['high'] & quality_cards_opponent['high'] & aggressiveness_opponent['high'], strategy_optimal['raise']))
+    rules.append(ctrl.Rule(odds_player['low'], strategy_optimal['raise']))
+
+
+    strategy_ctrl = ctrl.ControlSystem(rules)
     strategize = ctrl.ControlSystemSimulation(strategy_ctrl)
-
     strategize.input['aggressiveness'] = aggressiveness
     strategize.input['odds_player'] = odds_player_out
     strategize.input['quality_cards_opponent'] = quality_cards_opponent_out
 
     strategize.compute()
 
-    strategy_optimal.view(sim=strategize)
-
     optimal = strategize.output['strategy_optimal']
 
-    #visualize_memberships(Odds, odds_members[0], odds_members[1], odds_members[2], titles)
-    #visualize_result(Odds, odds_members[2], risk0, aggregated, optimal)
-    print("optimal  crisp", optimal)
     return optimal
 
 # UNCOMMENT FOR TESTING
