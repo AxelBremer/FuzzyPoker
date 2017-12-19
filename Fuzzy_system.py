@@ -179,6 +179,21 @@ def fuzzy_inference_output(X, value1, value2, members, rules):
 
     return result, risk0, aggregated
 
+def get_move_and_degree(optimal, universe):
+    fold_val = fuzz.interp_membership(universe, fuzz.trimf(universe, [0,0,0.5]), optimal)
+    call_val = fuzz.interp_membership(universe, fuzz.trimf(universe, [0,0.5,1]), optimal)
+    raise_val = fuzz.interp_membership(universe, fuzz.trimf(universe, [0.5,1,1]), optimal)
+
+    actions = [(fold_val, 'fold'),(call_val, 'call'), (raise_val, 'raise')]
+
+    print(actions)
+
+    # The result is the action related to the highest similarity
+    result = max(actions,key=itemgetter(0))
+
+    return result
+
+
 def run_fuzzy_system(tightness, aggressiveness, money_opponent, money_player, probability_hand ):
     # Compute risk aversion opponent
     # Input: tightness and aggressiveness of the opponent
@@ -192,7 +207,7 @@ def run_fuzzy_system(tightness, aggressiveness, money_opponent, money_player, pr
     titles = ["Tightness opponent", "Aggressiveness opponent", "Risk aversive behavior"]
     # visualize_memberships(Risk, risk_members[0], risk_members[1], risk_members[2], titles)
     # visualize_result(Risk, risk_members[2], risk0, aggregated, aversion)
-    print("aversion", aversion)
+    # print("aversion", aversion)
 
     # Compute quality cards opponent
     # Input: risk aversive behavior and money left opponent
@@ -205,7 +220,7 @@ def run_fuzzy_system(tightness, aggressiveness, money_opponent, money_player, pr
     titles = ["Risk aversion opponent", "Money left opponent ", "Quality cards opponent"]
     #visualize_memberships(Quality, quality_members[0], quality_members[1], quality_members[2], titles)
     #visualize_result(Quality, quality_members[2], risk0, aggregated, quality_cards_opponent)
-    print("quality", quality_cards_opponent_out)
+    # print("quality", quality_cards_opponent_out)
 
     # Compute odds player
     # Input: probability hand of hand player and money left player
@@ -219,7 +234,7 @@ def run_fuzzy_system(tightness, aggressiveness, money_opponent, money_player, pr
     titles = ["Probability hand", "Money left player", "Odds player"]
     #visualize_memberships(Odds, odds_members[0], odds_members[1], odds_members[2], titles)
     #visualize_result(Odds, odds_members[2], risk0, aggregated, odds_player)
-    print("odds", odds_player_out)
+    # print("odds", odds_player_out)
 
 
     # Compute optimal strategy player
@@ -251,7 +266,7 @@ def run_fuzzy_system(tightness, aggressiveness, money_opponent, money_player, pr
     rules.append(ctrl.Rule(odds_player['low'] & quality_cards_opponent['high'], strategy_optimal['fold']))
     rules.append(ctrl.Rule(odds_player['medium'] & quality_cards_opponent['low'], strategy_optimal['call']))
     rules.append(ctrl.Rule(odds_player['medium'] & quality_cards_opponent['medium'], strategy_optimal['raise']))
-    rules.append(ctrl.Rule(odds_player['medium'] & quality_cards_opponent['high'], strategy_optimal['call']))
+    rules.append(ctrl.Rule(odds_player['medium'] & quality_cards_opponent['high'], strategy_optimal['fold']))
     rules.append(ctrl.Rule(odds_player['high'] & quality_cards_opponent['low'], strategy_optimal['call']))
     rules.append(ctrl.Rule(odds_player['high'] & quality_cards_opponent['medium'], strategy_optimal['raise']))
     rules.append(ctrl.Rule(odds_player['high'] & quality_cards_opponent['high'], strategy_optimal['raise']))
@@ -271,13 +286,17 @@ def run_fuzzy_system(tightness, aggressiveness, money_opponent, money_player, pr
 
     optimal = strategize.output['strategy_optimal']
 
+    # strategy_optimal.view(sim=strategize)
+
+    optimal = get_move_and_degree(optimal, strategy_optimal.universe)
+
     return optimal
 
 # UNCOMMENT FOR TESTING
-tight = [0.1, 0.8, 0.5, 0]
-aggressive = [0.8, 0.1, 0.5, 0]
-money_opponent = [0.7, 0.2, 0.4, 0]
-money_player= [0.4, 0.8, 0.6, 0]
-probability = [0.9, 0.3, 0.5, 0]
-for i in range(len(tight)):
-    optimal = run_fuzzy_system(tight[i], aggressive[i], money_opponent[i], money_player[i], probability[i])
+# tight = [0.1, 0.8, 0.5, 0]
+# aggressive = [0.8, 0.1, 0.5, 0]
+# money_opponent = [0.7, 0.2, 0.4, 0]
+# money_player= [0.4, 0.8, 0.6, 0]
+# probability = [0.9, 0.3, 0.5, 0]
+# for i in range(len(tight)):
+#     optimal = run_fuzzy_system(tight[i], aggressive[i], money_opponent[i], money_player[i], probability[i])

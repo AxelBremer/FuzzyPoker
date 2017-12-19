@@ -22,7 +22,7 @@ else:
         config.register_player(name="Random", algorithm=RandomPokerPlayer())
         game_result = start_poker(config, verbose=0)
         players = game_result['players']
-        if players[0]['state'] == 'participating':
+        if players[0]['stack'] > players[1]['stack']:
             wins.append(1)
             amount.append(players[0]['stack']-players[1]['stack'])
         else:

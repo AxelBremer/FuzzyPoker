@@ -2,10 +2,11 @@ from pypokerengine.players import BasePokerPlayer
 from pprint import pprint
 from Calculations import Calculations as calc
 from Fuzzy_system import run_fuzzy_system
+import math
 
-def raise_amount(money_me, crisp_output, action):
+def raise_amount(money_me, degree, action):
     if action == 'raise':
-        return money_me * crisp_output
+        return math.floor(money_me * degree)
     return 0
 
 class FuzzyPokerPlayer(BasePokerPlayer):  # Do not forget to make parent class as "BasePokerPlayer"
@@ -23,10 +24,15 @@ class FuzzyPokerPlayer(BasePokerPlayer):  # Do not forget to make parent class a
         winprob = calc.get_winprob(round_state, hole_card)
 
         #action, amount = call_action_info["action"], call_action_info["amount"]
-        action, crisp_output = run_fuzzy_system(tight, aggro, money_opponent, money_me, winprob)
-        amount = raise_amount(money_me, crisp_output, action)
-        print('action: ', action)
-        print('amount:', amount)
+        (degree, action) = run_fuzzy_system(tight, aggro, money_opponent, money_me, winprob)
+        amount = raise_amount(me['stack'], degree, action)
+        # print('tight', tight)
+        # print('aggro', aggro)
+        # print('money_opponent', money_opponent)
+        # print('money_me', money_me)
+        # print('winprob', winprob)
+        # print('action: ', action)
+        # print('amount:', amount)
         return action, amount   # action returned here is sent to the poker engine
 
     def receive_game_start_message(self, game_info):
