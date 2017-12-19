@@ -3,6 +3,11 @@ from pprint import pprint
 from Calculations import Calculations as calc
 from Fuzzy_system import run_fuzzy_system
 
+def raise_amount(money_me, crisp_output, action):
+    if action == 'raise':
+        return money_me * crisp_output
+    return 0
+
 class FuzzyPokerPlayer(BasePokerPlayer):  # Do not forget to make parent class as "BasePokerPlayer"
 
     #  we define the logic to make an action through this method. (so this method would be the core of your AI)
@@ -16,8 +21,12 @@ class FuzzyPokerPlayer(BasePokerPlayer):  # Do not forget to make parent class a
         money_opponent = calc.get_money_score(round_state)[opponent['uuid']]
         money_me = calc.get_money_score(round_state)[me['uuid']]
         winprob = calc.get_winprob(round_state, hole_card)
-        print('sys out', run_fuzzy_system(tight, aggro, money_opponent, money_me, winprob))
-        action, amount = call_action_info["action"], call_action_info["amount"]
+
+        #action, amount = call_action_info["action"], call_action_info["amount"]
+        action, crisp_output = run_fuzzy_system(tight, aggro, money_opponent, money_me, winprob)
+        amount = raise_amount(money_me, crisp_output, action)
+        print('action: ', action)
+        print('amount:', amount)
         return action, amount   # action returned here is sent to the poker engine
 
     def receive_game_start_message(self, game_info):

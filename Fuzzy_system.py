@@ -172,7 +172,7 @@ def fuzzy_inference_output(X, value1, value2, members, rules):
     raise_val = 1 - spatial.distance.cosine(aggregated, mem3[2])
 
     # Define an action related to the cosine similarity
-    actions = [(fold_val, 'FOLD'),(call_val, 'CALL'), (raise_val, 'RAISE')]
+    actions = [(fold_val, 'fold'),(call_val, 'call'), (raise_val, 'raise')]
 
     # The result is the action related to the highest similarity
     result = max(actions,key=itemgetter(0))[1]
@@ -228,12 +228,13 @@ def run_fuzzy_system(tightness, aggressiveness, money_opponent, money_player, pr
     strategy_optimal = np.arange(0, 1, 0.1)
     Strategy = [x_quality, player_odds, strategy_optimal ]
     strategy_members = compute_memberships(Strategy, [0, 0.5, 1])
-    optimal, risk0, aggregated = fuzzy_inference_output(Strategy, quality_cards_opponent, odds_player, strategy_members, "strategy")
+    optimal_fuzzy, risk0, aggregated = fuzzy_inference_output(Strategy, quality_cards_opponent, odds_player, strategy_members, "strategy")
+    optimal_crips, risk0_1, aggregated_1 = fuzzy_inference(Strategy, quality_cards_opponent, odds_player, strategy_members, "strategy")
     titles = ["Quality cards opponent", "Odds player", "Strategy"]
     #visualize_memberships(Odds, odds_members[0], odds_members[1], odds_members[2], titles)
     #visualize_result(Odds, odds_members[2], risk0, aggregated, optimal)
     # print("optimal  crisp", optimal)
-    return optimal
+    return optimal_fuzzy, optimal_crips
 
 # UNCOMMENT FOR TESTING
 # tight = [0.1, 1, 0.5, 0]
