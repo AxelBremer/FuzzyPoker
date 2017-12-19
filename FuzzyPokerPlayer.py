@@ -47,8 +47,6 @@ class FuzzyPokerPlayer(BasePokerPlayer):  # Do not forget to make parent class a
         # print('money_me', money_me)
         # print('winprob', winprob)
         print('action: ', action)
-        if action == 'raise':
-            amount = valid_actions[2]['amount']['min']
         print('amount: ', amount)
         return action, amount   # action returned here is sent to the poker engine
 
