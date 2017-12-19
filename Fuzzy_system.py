@@ -172,7 +172,7 @@ def fuzzy_inference_output(X, value1, value2, members, rules):
     raise_val = 1 - spatial.distance.cosine(aggregated, mem3[2])
 
     # Define an action related to the cosine similarity
-    actions = [(fold_val, 'FOLD'),(call_val, 'CALL'), (raise_val, 'RAISE')]
+    actions = [(fold_val, 'fold'),(call_val, 'call'), (raise_val, 'raise')]
 
     # The result is the action related to the highest similarity
     result = max(actions,key=itemgetter(0))[1]
