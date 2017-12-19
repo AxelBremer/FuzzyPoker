@@ -30,7 +30,6 @@ class FuzzyPokerPlayer(BasePokerPlayer):  # Do not forget to make parent class a
             return 'fold', 0
 
         # valid_actions format => [raise_action_info, call_action_info, fold_action_info]
-        call_action_info = valid_actions[1]
         me = round_state['seats'][round_state['next_player']]
         opponent = round_state['seats'][1-round_state['next_player']]
         aggro = calc.player_aggressiveness(round_state)[opponent['uuid']]
@@ -48,7 +47,9 @@ class FuzzyPokerPlayer(BasePokerPlayer):  # Do not forget to make parent class a
         # print('money_me', money_me)
         # print('winprob', winprob)
         print('action: ', action)
-        print('amount:', amount)
+        if action == 'raise':
+            amount = valid_actions[2]['amount']['min']
+        print('amount: ', amount)
         return action, amount   # action returned here is sent to the poker engine
 
     def receive_game_start_message(self, game_info):
