@@ -192,7 +192,7 @@ def run_fuzzy_system(tightness, aggressiveness, money_opponent, money_player, pr
     titles = ["Tightness opponent", "Aggressiveness opponent", "Risk aversive behavior"]
     # visualize_memberships(Risk, risk_members[0], risk_members[1], risk_members[2], titles)
     # visualize_result(Risk, risk_members[2], risk0, aggregated, aversion)
-    # print("aversion", aversion)
+    print("aversion", aversion)
 
     # Compute quality cards opponent
     # Input: risk aversive behavior and money left opponent
@@ -201,11 +201,11 @@ def run_fuzzy_system(tightness, aggressiveness, money_opponent, money_player, pr
     x_quality = np.arange(0, 1, 0.1)
     Quality = [x_risk_av, x_left_opponent, x_quality ]
     quality_members = compute_memberships(Quality, [0, 0.5, 1])
-    quality_cards_opponent, risk0, aggregated = fuzzy_inference(Quality, aversion, money_opponent, quality_members, "quality")
+    quality_cards_opponent_out, risk0, aggregated = fuzzy_inference(Quality, aversion, money_opponent, quality_members, "quality")
     titles = ["Risk aversion opponent", "Money left opponent ", "Quality cards opponent"]
     #visualize_memberships(Quality, quality_members[0], quality_members[1], quality_members[2], titles)
     #visualize_result(Quality, quality_members[2], risk0, aggregated, quality_cards_opponent)
-    # print("quality", quality_cards_opponent)
+    print("quality", quality_cards_opponent_out)
 
     # Compute odds player
     # Input: probability hand of hand player and money left player
@@ -215,31 +215,55 @@ def run_fuzzy_system(tightness, aggressiveness, money_opponent, money_player, pr
     player_odds = np.arange(0, 1, 0.1)
     Odds = [probability, money_left_player, player_odds ]
     odds_members = compute_memberships(Odds, [0, 0.5, 1])
-    odds_player, risk0, aggregated = fuzzy_inference(Odds, probability_hand, money_player, odds_members, "odds")
+    odds_player_out, risk0, aggregated = fuzzy_inference(Odds, probability_hand, money_player, odds_members, "odds")
     titles = ["Probability hand", "Money left player", "Odds player"]
     #visualize_memberships(Odds, odds_members[0], odds_members[1], odds_members[2], titles)
     #visualize_result(Odds, odds_members[2], risk0, aggregated, odds_player)
-    # print("odds", odds_player)
+    print("odds", odds_player_out)
 
 
     # Compute optimal strategy player
     # Input: quality cards opponent and odds player
     # Ouput: indication of optimal strategy for player
-    strategy_optimal = np.arange(0, 1, 0.1)
-    Strategy = [x_quality, player_odds, strategy_optimal ]
-    strategy_members = compute_memberships(Strategy, [0, 0.5, 1])
-    optimal, risk0, aggregated = fuzzy_inference_output(Strategy, quality_cards_opponent, odds_player, strategy_members, "strategy")
-    titles = ["Quality cards opponent", "Odds player", "Strategy"]
+    aggressiveness_opponent = ctrl.Antecedent(np.arange(0,1,0.1), 'aggressiveness')
+    aggressiveness_opponent.automf(3)
+    quality_cards_opponent = ctrl.Antecedent(np.arange(0,1,0.1), 'quality_cards_opponent')
+    quality_cards_opponent.automf(3)
+    odds_player = ctrl.Antecedent(np.arange(0,1, 0.1), 'odds_player')
+    odds_player.automf(3)
+    strategy_optimal = ctrl.Consequent(np.arange(0, 1, 0.1), 'strategy_optimal')
+    strategy_optimal['fold'] = fuzz.trimf(strategy_optimal.universe, [0,0,0.5])
+    strategy_optimal['call'] = fuzz.trimf(strategy_optimal.universe, [0,0.5,1])
+    strategy_optimal['raise'] = fuzz.trimf(strategy_optimal.universe, [0.5,1,1])
+
+    rule1 = ctrl.Rule(odds_player['poor'] & aggressiveness_opponent['good'] & quality_cards_opponent['poor'], strategy_optimal['raise'])
+    rule2 = ctrl.Rule(quality_cards_opponent['poor'] & odds_player['average'], strategy_optimal['call'])
+    rule3 = ctrl.Rule(quality_cards_opponent['poor'] & odds_player['good'], strategy_optimal['raise'])
+    rule1 = ctrl.Rule(odds_player['poor'] & aggressiveness_opponent['poor'], strategy_optimal['fold'])
+
+    strategy_ctrl = ctrl.ControlSystem([rule1,rule2,rule3])
+    strategize = ctrl.ControlSystemSimulation(strategy_ctrl)
+
+    strategize.input['aggressiveness'] = aggressiveness
+    strategize.input['odds_player'] = odds_player_out
+    strategize.input['quality_cards_opponent'] = quality_cards_opponent_out
+
+    strategize.compute()
+
+    strategy_optimal.view(sim=strategize)
+
+    optimal = strategize.output['strategy_optimal']
+
     #visualize_memberships(Odds, odds_members[0], odds_members[1], odds_members[2], titles)
     #visualize_result(Odds, odds_members[2], risk0, aggregated, optimal)
-    # print("optimal  crisp", optimal)
+    print("optimal  crisp", optimal)
     return optimal
 
 # UNCOMMENT FOR TESTING
-# tight = [0.1, 1, 0.5, 0]
-# aggressive = [0.8, 0.1, 0.5, 0]
-# money_opponent = [0.7, 0.2, 0.4, 0]
-# money_player= [0.4, 0.8, 0.6, 0]
-# probability = [0.9, 0.3, 0.5, 0]
-# for i in range(len(tight)):
-#     optimal = run_fuzzy_system(tight[i], aggressive[i], money_opponent[i], money_player[i], probability[i])
+tight = [0.1, 0.8, 0.5, 0]
+aggressive = [0.8, 0.1, 0.5, 0]
+money_opponent = [0.7, 0.2, 0.4, 0]
+money_player= [0.4, 0.8, 0.6, 0]
+probability = [0.9, 0.3, 0.5, 0]
+for i in range(len(tight)):
+    optimal = run_fuzzy_system(tight[i], aggressive[i], money_opponent[i], money_player[i], probability[i])

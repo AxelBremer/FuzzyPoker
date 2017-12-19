@@ -32,41 +32,41 @@ class ConsolePlayer(BasePokerPlayer):
         self.__wait_until_input()
 
     def __wait_until_input(self):
-        raw_input("Enter some key to continue ...")
+        input("Enter some key to continue ...")
 
     def __gen_raw_input_wrapper(self):
-        return lambda msg: raw_input(msg)
+        return lambda msg: input(msg)
 
     def __receive_action_from_console(self, valid_actions):
-    flg = self.input_receiver('Enter f(fold), c(call), r(raise).\n >> ')
-    if flg in self.__gen_valid_flg(valid_actions):
-      if flg == 'f':
-        return valid_actions[0]['action'], valid_actions[0]['amount']
-      elif flg == 'c':
-        return valid_actions[1]['action'], valid_actions[1]['amount']
-      elif flg == 'r':
-        valid_amounts = valid_actions[2]['amount']
-        raise_amount = self.__receive_raise_amount_from_console(valid_amounts['min'], valid_amounts['max'])
-        return valid_actions[2]['action'], raise_amount
-    else:
-      return self.__receive_action_from_console(valid_actions)
+        flg = self.input_receiver('Enter f(fold), c(call), r(raise).\n >> ')
+        if flg in self.__gen_valid_flg(valid_actions):
+            if flg == 'f':
+                return valid_actions[0]['action'], valid_actions[0]['amount']
+            elif flg == 'c':
+                return valid_actions[1]['action'], valid_actions[1]['amount']
+            elif flg == 'r':
+                valid_amounts = valid_actions[2]['amount']
+                raise_amount = self.__receive_raise_amount_from_console(valid_amounts['min'], valid_amounts['max'])
+            return valid_actions[2]['action'], raise_amount
+        else:
+            return self.__receive_action_from_console(valid_actions)
 
-  def __gen_valid_flg(self, valid_actions):
-    flgs = ['f', 'c']
-    is_raise_possible = valid_actions[2]['amount']['min'] != -1
-    if is_raise_possible:
-      flgs.append('r')
-    return flgs
+    def __gen_valid_flg(self, valid_actions):
+        flgs = ['f', 'c']
+        is_raise_possible = valid_actions[2]['amount']['min'] != -1
+        if is_raise_possible:
+            flgs.append('r')
+        return flgs
 
-  def __receive_raise_amount_from_console(self, min_amount, max_amount):
-    raw_amount = self.input_receiver("valid raise range = [%d, %d]" % (min_amount, max_amount))
-    try:
-      amount = int(raw_amount)
-      if min_amount <= amount and amount <= max_amount:
-        return amount
-      else:
-        print("Invalid raise amount %d. Try again.")
-        return self.__receive_raise_amount_from_console(min_amount, max_amount)
-    except:
-      print("Invalid input received. Try again.")
-      return self.__receive_raise_amount_from_console(min_amount, max_amount)
+    def __receive_raise_amount_from_console(self, min_amount, max_amount):
+        raw_amount = self.input_receiver("valid raise range = [%d, %d]" % (min_amount, max_amount))
+        try:
+            amount = int(raw_amount)
+            if min_amount <= amount and amount <= max_amount:
+                return amount
+            else:
+                print("Invalid raise amount %d. Try again.")
+                return self.__receive_raise_amount_from_console(min_amount, max_amount)
+        except:
+            print("Invalid input received. Try again.")
+            return self.__receive_raise_amount_from_console(min_amount, max_amount)
