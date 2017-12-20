@@ -40,7 +40,12 @@ class FuzzyPokerPlayer(BasePokerPlayer):  # Do not forget to make parent class a
 
         #action, amount = call_action_info["action"], call_action_info["amount"]
         (degree, action) = run_fuzzy_system(tight, aggro, money_opponent, money_me, winprob)
+
+        if action == 'fold' and valid_actions[1]['amount'] == 0:
+            action = 'call instead'
+            amount = 0
         amount = raise_amount(me['stack'], degree, action)
+
         # print('tight', tight)
         # print('aggro', aggro)
         # print('money_opponent', money_opponent)

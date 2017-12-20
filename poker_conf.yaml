@@ -1,6 +1,6 @@
 ai_players:
 - name: FuzzyPokerPlayer
-  path: E:/FuzzyPoker/FuzzyPokerPlayer.py
+  path: C:/FuzzyPoker/FuzzyPokerPlayer.py
 ante: 0
 blind_structure: null
 initial_stack: 200
